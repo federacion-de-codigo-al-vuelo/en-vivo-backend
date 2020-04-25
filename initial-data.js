@@ -1,0 +1,46 @@
+const crypto = require('crypto');
+const randomString = () => crypto.randomBytes(6).hexSlice();
+
+module.exports = async keystone => {
+  // Count existing users
+  const {
+    data: {
+      _allUsersMeta: { count },
+    },
+  } = await keystone.executeQuery(
+    `query {
+      _allUsersMeta {
+        count
+      }
+    }`
+  );
+
+  if (count === 0) {
+    const password = 'password';
+    const email = 'user@keystone.com';
+
+    await keystone.executeQuery(
+      `mutation initialUser($password: String, $email: String) {
+            createUser(data: {name: "Admin", email: $email, isAdmin: true, password: $password}) {
+              id
+            }
+          }`,
+      {
+        variables: {
+          password,
+          email,
+        },
+      }
+    );
+
+    console.log(`
+      Usuario inicial creado:
+      email: ${email}
+      password: ${password}
+
+      Por favor cambia las credenciales.
+      
+    `);
+
+  }
+};
