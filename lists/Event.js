@@ -3,12 +3,19 @@ const { AuthedRelationship } = require('@keystonejs/fields-authed-relationship')
 
 const ImageRelationship = require('../keystone-media-server/fields/ImageRelationship')
 
+const resolveInput = require('../hooks/addSlug');
+
+
 module.exports = {
     fields: {
         name: {
             type: Text,
             label: "Event name",
             isRequired: true,
+        },
+        slug: {
+            type: Text,
+            label: "Slug",
         },
         image: {
             type: ImageRelationship,
@@ -33,6 +40,12 @@ module.exports = {
             isRequired: true,
         },
     },
+
+    hooks: {
+        resolveInput
+    },
+    
+
     labelField: "name",
     adminConfig: {
         defaultColumns: "image,startDate,owner",
