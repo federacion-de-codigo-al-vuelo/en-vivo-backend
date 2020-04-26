@@ -1,0 +1,3 @@
+[submodule "keystone-media-server"]
+	path = keystone-media-server
+	url = git@gitlab.com:centroculturadigital-mx/servidor-media/keystone-media-server.git
