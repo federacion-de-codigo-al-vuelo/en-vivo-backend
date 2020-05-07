@@ -1,4 +1,4 @@
-const slugify = require("../funciones/herramientas/slugify")
+const slugify = require("../functions/tools/slugify")
 
 const resolveInput = async ({
     operation,

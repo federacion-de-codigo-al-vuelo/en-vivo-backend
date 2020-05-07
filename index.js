@@ -5,12 +5,13 @@ const { GraphQLApp } = require('@keystonejs/app-graphql');
 const { AdminUIApp } = require('@keystonejs/app-admin-ui');
 const { StaticApp } = require('@keystonejs/app-static');
 
-const initialiseData = require('./initial-data');
+const seedData = require('./seed/seed');
 
 const expressSession = require('express-session');
 const MongoStore = require('connect-mongo')(expressSession);
 
 const resolveImageInput = require('./keystone-media-server/resolvers/imageInput') 
+const createImageSizes = require('./keystone-media-server/seed/createImageSizes') 
 
 const {
   MONGO_URI,
@@ -25,7 +26,8 @@ const staticSrc = "./archivos"
 const {
   User,
   Configuration,
-  Event
+  Event,
+  EventCategory
 }= require('./lists')
 
 const { Image, MediaFile, ImageSize } = require('./keystone-media-server/lists/index')
@@ -42,7 +44,10 @@ const keystone = new Keystone({
   sessionStore,
   name: PROJECT_NAME,
   adapter: new Adapter(),
-  onConnect: initialiseData,
+  onConnect: ()=>{
+    seedData(keystone)
+    createImageSizes(keystone)
+  },
 });
 
 
@@ -59,13 +64,19 @@ Image.hooks = {
 
 keystone.createList('User', User);
 
+// media server:
 keystone.createList('ImageSize', ImageSize);
 keystone.createList('MediaFile', MediaFile);
 keystone.createList('Image', Image);
 
+
+// our entities:
+
+
 keystone.createList('Configuration', Configuration);
 
 keystone.createList('Event', Event);
+keystone.createList('EventCategory', EventCategory);
 
 
 

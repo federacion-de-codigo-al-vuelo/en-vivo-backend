@@ -1,54 +1,76 @@
-const generar = require("./funcionesGenerar")
+const faker = require("faker/locale/es_MX")
+const moment = require("moment")
 
-const categoriaEventoGenerar = i => {
+const generate = require("./generateFunctions")
 
-    let name = generar.name(4,1)
-    
+
+const eventCategoryGenerate = ( i, past, future ) => {
+
+    let name = generate.name(5,2)
+
+  
+
     return {
-        name: name
+        name: name,
     }
-
 }
 
-const crearCategoriaEventos = async (keystone, amount) => {
-  const categoriaEventosMetaQuery = await keystone.executeQuery(
+const createEventCategories = async (keystone, amount) => {
+  const eventCategoriesMetaQuery = await keystone.executeQuery(
     `query {
-      _allCategoriasEventoMeta {
+      _allEventCategoriesMeta {
         count
       }
     }`
   );
 
-  let categoriaEventosCuenta = categoriaEventosMetaQuery.data ?
-    categoriaEventosMetaQuery.data._allCategoriasEventoMeta?
-      categoriaEventosMetaQuery.data._allCategoriasEventoMeta.count
+  let eventCategoriesCount = eventCategoriesMetaQuery.data ?
+    eventCategoriesMetaQuery.data._allEventCategoriesMeta?
+      eventCategoriesMetaQuery.data._allEventCategoriesMeta.count
       : null
   : null
   
-  
 
-  if (categoriaEventosCuenta === 0) {
+  if (eventCategoriesCount === 0) {
         
     for( let i = 0; i<amount; i++) {
 
         
         const res = await keystone.executeQuery(
-            `mutation initialCategoriaEvento($data: CategoriaEventoCreateInput) {
-              createCategoriaEvento(data: $data) {
-                  id
+            `mutation initialEventCategory($data: EventCategoryCreateInput) {
+                createEventCategory(data: $data) {
+                    id
                 }
             }`,
             {
                 variables: {
-                    data: categoriaEventoGenerar( i )
+                    data: eventCategoryGenerate( i,i<10 )
                 },
             }
         );
-        
+            
     }
+    for( let i = 0; i<10; i++) {
+
+        
+        const res = await keystone.executeQuery(
+            `mutation initialEventCategory($data: EventCategoryCreateInput) {
+                createEventCategory(data: $data) {
+                    id
+                }
+            }`,
+            {
+                variables: {
+                    data: eventCategoryGenerate( i, true, true )
+                },
+            }
+        );
+            
+    }
+
     
   }
 }
 
 
-module.exports = crearCategoriaEventos
+module.exports = createEventCategories

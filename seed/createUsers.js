@@ -1,6 +1,4 @@
-const randomString = require("./randomString")
-
-const crearPrimerUsuario = async (keystone) => {
+const createUsers = async (keystone) => {
   const usersMetaQuery = await keystone.executeQuery(
     `query {
       _allUsersMeta {
@@ -17,12 +15,12 @@ const crearPrimerUsuario = async (keystone) => {
   
 
   if (usersCount === 0) {
-    const password = 'password1';
-    const email = 'labweb@gmail.com';
+    const password = 'password';
+    const email = 'user@envivo.com';
 
     await keystone.executeQuery(
       `mutation initialUser($password: String, $email: String) {
-            createUser(data: {name: "Admin", email: $email, isAdmin: true, password: $password}) {
+            createUser(data: {name: "usuario", email: $email, isAdmin: true, password: $password}) {
               id
             }
           }`,
@@ -39,9 +37,9 @@ const crearPrimerUsuario = async (keystone) => {
 User created:
   email: ${email}
   password: ${password}
-Please change these details after initial login.
+
 `);
   }
 }
 
-module.exports = crearPrimerUsuario
+module.exports = createUsers

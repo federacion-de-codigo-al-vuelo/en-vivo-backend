@@ -15,6 +15,7 @@ const relate = async (keystone, e1,e2) => {
         payload = [ payload ]
     }
 
+
     const variables = {
         "id": e1.id,
         "data": {
@@ -36,6 +37,7 @@ const relate = async (keystone, e1,e2) => {
         { variables }
     );
 
+    
 
     return res
 

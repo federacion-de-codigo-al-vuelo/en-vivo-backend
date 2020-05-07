@@ -1,55 +1,62 @@
-const crearPrimerUsuario = require("./seed/crearPrimerUsuario.js")
-const crearConfiguracion = require("./seed/crearConfiguracion.js")
-const crearEventos = require("./seed/crearEventos.js")
-const crearCategoriasEvento = require("./seed/crearCategoriasEvento.js")
-const crearEspacios = require("./seed/crearEspacios.js")
-const crearLogotipos = require("./seed/crearLogotipos.js")
+const createUsers = require("./createUsers.js")
+const createConfiguration = require("./createConfiguration.js")
+const createEvents = require("./createEvents.js")
+const createEventCategories = require("./createEventCategories.js")
 
-const generarRelaciones = require('./seed/funciones/generarRelaciones')
+const relationships = require('./functions/relationships')
 
 
 module.exports = async keystone => {
 
-  if (process.env.RESET_DB == 'TRUE') {
+  if (process.env.RESET_DB == 1) {
+
+    console.log("\n\nseeding data...\n\n")
 
     Object.values(keystone.adapters).forEach(async adapter => {
       await adapter.dropDatabase();
+      console.warn("db dropped")
     });
 
     
-    await crearPrimerUsuario(keystone)
-    console.log('crearPrimerUsuario: DONE');
+    await createUsers(keystone)
+    console.log('createUsers: DONE');
     
-    await crearConfiguracion(keystone)
-    console.log('crearConfiguracion: DONE');
+    await createConfiguration(keystone)
+    console.log('createConfiguration: DONE');
     
-    await crearEventos(keystone, 20)
-    console.log('crearEventos: DONE');
+    await createEvents(keystone, 30)
+    console.log('createEvents: DONE');
     
-    await crearCategoriasEvento(keystone, 15)
-    console.log('crearCategoriasEvento: DONE');
+    await createEventCategories(keystone, 9)
+    console.log('createEventCategories: DONE');
     
     
     
-    await generarRelaciones(keystone, {
-      name: 'Evento',
-      plural: 'Eventos',
-      field: 'categoria',
+    const rels = await relationships(keystone, {
+      name: 'EventCategory',
+      plural: 'EventCategories',
+      field: 'events',
     }, {
-      name: 'CategoriaEvento',
-      plural: 'CategoriasEvento',
+      name: 'Event',
+      plural: 'events',
+      field: 'categories',
     }, {
-      cardinality: 'MANY_TO_ONE',
-      maximum1: 1,
-      maximum2: 1,
+      cardinality: 'MANY_TO_MANY',
+      maximum1: 10,
+      maximum2: 3,
       minimum1: 1,
-      minimum2: 0,
+      minimum2: 1,
       
-      probability: 1
+      probability:1
     })
-    console.log('generarRelaciones Evento y CategoriaEvento: DONE', );
+    console.log('relationships: Event, EventCategory: DONE' );
   
   }
+
+  
+  
+
+  console.log("\n\nseeding data: DONE\n\n")
 
 
 };

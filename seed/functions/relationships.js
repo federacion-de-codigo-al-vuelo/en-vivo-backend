@@ -2,6 +2,7 @@
 const relationshipCalculate = require("./relationshipCalculator")
 const createRelationship = require("./relationship")
 const shuffle = require('../../functions/tools/shuffle')
+const capitalize = require('../../functions/tools/capitalize')
 
 const select = (cardinality, relationshipsNum, entity2) => {
 
@@ -19,7 +20,7 @@ const select = (cardinality, relationshipsNum, entity2) => {
 
 }
 
-const generarRelaciones = async (
+const generateRelationships = async (
   keystone,
   entity1,
   entity2,
@@ -37,7 +38,7 @@ const generarRelaciones = async (
 
   const entity1Query = await keystone.executeQuery(
     `query {
-      all${entity1.plural} {
+      all${capitalize(entity1.plural)} {
         id
         name
       }
@@ -46,15 +47,17 @@ const generarRelaciones = async (
 
   const entity2Query = await keystone.executeQuery(
     `query {
-      all${entity2.plural} {
+      all${capitalize(entity2.plural)} {
         id
         name
       }
     }`
   );
 
-  let entity1Collection = shuffle(entity1Query.data['all' + entity1.plural])
-  let entity2Collection = shuffle(entity2Query.data['all' + entity2.plural])
+  
+
+  let entity1Collection = shuffle(entity1Query.data['all' + capitalize(entity1.plural)])
+  let entity2Collection = shuffle(entity2Query.data['all' + capitalize(entity2.plural)])
 
 
   let amount1 = entity1Collection.length
@@ -92,7 +95,7 @@ const generarRelaciones = async (
   
   let responses = await entity1Collection.map(async e => {
     
-    e.relationships.map(async (otraId) =>{
+    await e.relationships.map(async (otherId) =>{
       const res = await createRelationship(
         keystone, 
         {
@@ -102,7 +105,7 @@ const generarRelaciones = async (
           many: many1
         },
         {
-          id: otraId,
+          id: otherId,
           name: entity2.name,
           field: entity2.field,
           many: many2
@@ -112,6 +115,8 @@ const generarRelaciones = async (
     })
   })  
     
+
+  return responses
 }
     
-module.exports=generarRelaciones
+module.exports=generateRelationships

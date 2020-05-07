@@ -1,100 +1,123 @@
 const faker = require("faker/locale/es_MX")
 const moment = require("moment")
 
-const generar = require("./funcionesGenerar")
+const generate = require("./generateFunctions")
 
 
-const eventoGenerar = ( i, pasado, futuro ) => {
+const eventGenerate = ( i, past, future ) => {
 
-    let name = generar.name(5,2)
+    let name = generate.name(5,2)
 
-    let fecha_inicio
+    let dateStart
 
-    let diasSemana = 7
-    if( !! pasado && !! futuro ) {
-        fecha_inicio = faker.date.between(
-            moment( new Date() ).add( - diasSemana / 2, 'd' ),
-            moment( new Date() ).add( diasSemana / 2, 'd' ),
+    let daysWeek = 7
+    if( !! past && !! future ) {
+        dateStart = faker.date.between(
+            moment( new Date() ).add( - daysWeek / 2, 'd' ),
+            moment( new Date() ).add( daysWeek / 2, 'd' ),
 
         )
-    } else if( ! pasado ) {
-        fecha_inicio = faker.date.future(1)
+    } else if( ! past ) {
+        dateStart = faker.date.future(1)
     } else {
-        fecha_inicio = faker.date.past(1)
+        dateStart = faker.date.past(1)
     }
 
-    let fecha_final = moment(new Date(fecha_inicio)).add(
+    let dateEnd = moment(new Date(dateStart)).add(
         Math.ceil(Math.random()*4),'h'
     ).toDate().toISOString()
 
-    fecha_final = moment(new Date(fecha_inicio)).add(
+    dateEnd = moment(new Date(dateStart)).add(
         Math.ceil(Math.random()*4)*15,'m'
     ).toDate().toISOString()
 
-    fecha_inicio = fecha_inicio.toISOString()
+    dateStart = dateStart.toISOString()
 
     return {
         name: name,
-        imagen: generar.imagen(),
-        imagen_portada: generar.imagen(),
-        fecha_inicio: fecha_inicio,
-        fecha_final: fecha_final,
-        descripcion: generar.contenido(7,3),
-        meta_title: name,
-        meta_descripcion: generar.parrafo(),
+        description: generate.content(7,3),
+        dateStart: dateStart,
+        dateEnd: dateEnd,
     }
 }
 
-const crearEventos = async (keystone, amount) => {
-  const eventosMetaQuery = await keystone.executeQuery(
+const createEvents = async (keystone, amount) => {
+  const eventsMetaQuery = await keystone.executeQuery(
     `query {
-      _allEventosMeta {
+      _allEventsMeta {
         count
       }
     }`
   );
 
-  let eventosCuenta = eventosMetaQuery.data ?
-    eventosMetaQuery.data._allEventosMeta?
-      eventosMetaQuery.data._allEventosMeta.count
+  let eventsCount = eventsMetaQuery.data ?
+    eventsMetaQuery.data._allEventsMeta?
+      eventsMetaQuery.data._allEventsMeta.count
       : null
   : null
   
 
-  if (eventosCuenta === 0) {
+  if (eventsCount === 0) {
         
+
+
     for( let i = 0; i<amount; i++) {
 
-        
-        const res = await keystone.executeQuery(
-            `mutation initialEvento($data: EventoCreateInput) {
-                createEvento(data: $data) {
-                    id
-                }
-            }`,
-            {
-                variables: {
-                    data: eventoGenerar( i,i<10 )
-                },
-            }
-        );
-            
-    }
-    for( let i = 0; i<10; i++) {
 
         
-        const res = await keystone.executeQuery(
-            `mutation initialEvento($data: EventoCreateInput) {
-                createEvento(data: $data) {
+        const imageQuery = await keystone.executeQuery(
+            `mutation eventImage($data: ImageCreateInput) {
+                createImage(data: $data) {
                     id
                 }
             }`,
             {
                 variables: {
-                    data: eventoGenerar( i, true, true )
+                    data: {
+                        original: generate.image()
+                    }
+                },
+            }
+        )
+
+        image = imageQuery.data ? imageQuery.data.createImage.id : null
+        
+
+
+        const event = await keystone.executeQuery(
+            `mutation initialEvent($data: EventCreateInput) {
+                createEvent(data: $data) {
+                    id
+                }
+            }`,
+            {
+                variables: {
+                    data: eventGenerate( i, true, true )
                 },
             }
         );
+
+
+        let res = await keystone.executeQuery(
+            `mutation addEventImage($id: ID!, $data: EventUpdateInput) {
+                updateEvent(id: $id, data: $data) {
+                    id
+                }
+            }`,
+            {
+                variables: {
+                    id: event.data.createEvent.id,
+                    data: {
+                        image: {
+                            connect: {
+                                id: image
+                            }
+                        }
+                    }
+                },
+            }
+        );
+
             
     }
 
@@ -103,4 +126,4 @@ const crearEventos = async (keystone, amount) => {
 }
 
 
-module.exports = crearEventos
+module.exports = createEvents

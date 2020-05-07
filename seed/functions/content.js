@@ -1,10 +1,10 @@
 const faker = require("faker/locale/es_MX")
 
-const blocks = (maxNum,numMin) => {
+const blocks = (maxNum,minNum) => {
 
   if( parseInt(maxNum) > 0 ) {
 
-    let amount = Math.max(Math.ceil(Math.random()*maxNum),numMin)
+    let amount = Math.max(Math.ceil(Math.random()*maxNum),minNum)
   
     let blocks = new Array( amount ).fill(0).map(e=>{
   
@@ -51,14 +51,14 @@ const blocks = (maxNum,numMin) => {
 
   
 
-const content = (maxNum,numMin,config) => {
+const content = (maxNum,minNum,config) => {
 
     if( ! maxNum ) {
         maxNum = 0
     }
 
-    if( ! numMin ) {
-        numMin = maxNum
+    if( ! minNum ) {
+        minNum = maxNum
     }
 
     const {

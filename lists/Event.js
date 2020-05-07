@@ -1,4 +1,5 @@
-const { Text, DateTime } = require('@keystonejs/fields');
+const { Text, DateTime, Relationship } = require('@keystonejs/fields');
+const { Content } = require('@keystonejs/field-content');
 const { AuthedRelationship } = require('@keystonejs/fields-authed-relationship');
 
 const ImageRelationship = require('../keystone-media-server/fields/ImageRelationship')
@@ -17,27 +18,33 @@ module.exports = {
             type: Text,
             label: "Slug",
         },
+        description: {
+            type: Content,
+            label: "Content",
+        },
         image: {
             type: ImageRelationship,
             label: "Image",
             ref: "Image",
-            isRequired: true,
         },
         dateStart: {
             type: DateTime,
             label: "Start Date",
-            isRequired: true,
         },
         dateEnd: {
             type: DateTime,
             label: "End Date",
-            isRequired: true,
         },
         owner: {
             type: AuthedRelationship,
             label: "Owner",
             ref: "User",
-            isRequired: true,
+        },
+        categories: {
+            type: Relationship,
+            label: "Categories",
+            ref: "EventCategory.events",
+            many: true
         },
     },
 

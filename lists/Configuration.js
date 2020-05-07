@@ -19,6 +19,16 @@ module.exports = {
             type: ImageRelationship,
             ref: "Image"
         },
+        
+        meta_title: {
+            type: Text,
+            ref: "Title for Metadata"
+        },
+        
+        meta_description: {
+            type: Text,
+            ref: "Content for Metadata"
+        },
 
         
     },

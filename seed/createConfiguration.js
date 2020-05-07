@@ -1,65 +1,46 @@
-const randomString = require("./randomString")
-const config = require("../data/config")
-const { File } = require('@keystonejs/fields');
-
-const generar = require("./funcionesGenerar")
+const generate = require("./generateFunctions")
 
 
 
-const configuracionGenerar = () => {
+const configurationGenerate = () => {
 
   return {
-    title: config.name,
-    logotipo: generar.imagen(),
-    video_presentacion_codigo: generar.video(),
-    portada_imagen: generar.imagen(),
-    facebook: generar.redes(config.name).facebook,
-    twitter: generar.redes(config.name).twitter,
-    instagram: generar.redes(config.name).instagram,
-    introduccion_extracto: generar.parrafo(),
-    introduccion_contenido: generar.contenido(3),
-    cartelera: generar.imagen(),
-    ubicacion_imagen: generar.imagen(),
-    ubicacion: generar.contenido(0,0,{ tipoInicial: "sentence", longitudTitle: 2 }),
-    informacion: generar.contenido(2),
-    contacto: generar.contenido(2),
-    visitas_title: "Visitas",
-    visitas_text: generar.contenido(2),
-    aviso_privacidad: generar.contenido(2),
-    meta_title: config.name,
-    meta_descripcion: generar.parrafo(),
+    name: "Site Configuration",
+    site_name: "ENVIVO",
+    meta_title: "ENVIVO",
+    meta_descripcion: generate.paragraph(),
   }
 }
 
-const crearConfiguraciones = async keystone => {
-  const configuracionesMetaQuery = await keystone.executeQuery(
+const configurationsCreate = async keystone => {
+  const configurationsMetaQuery = await keystone.executeQuery(
     `query {
-      _allConfiguracionesMeta {
+      _allConfigurationsMeta {
         count
       }
     }`
   );
 
-  let configuracionesCuenta = configuracionesMetaQuery.data ?
-    configuracionesMetaQuery.data._allConfiguracionesMeta?
-      configuracionesMetaQuery.data._allConfiguracionesMeta.count
+  let configurationsCount = configurationsMetaQuery.data ?
+    configurationsMetaQuery.data._allConfigurationsMeta?
+      configurationsMetaQuery.data._allConfigurationsMeta.count
       : null
   : null
   
 
-  if (configuracionesCuenta === 0) {
+  if (configurationsCount === 0) {
     
     
     
     const res = await keystone.executeQuery(
-      `mutation initialConfiguracion($data: ConfiguracionCreateInput) {
-            createConfiguracion(data: $data) {
+      `mutation initialConfiguration($data: ConfigurationCreateInput) {
+            createConfiguration(data: $data) {
               id
             }
           }`,
       {
         variables: {
-          data: configuracionGenerar()
+          data: configurationGenerate()
         },
       }
     );
@@ -69,4 +50,4 @@ const crearConfiguraciones = async keystone => {
 }
 
 
-module.exports = crearConfiguraciones
+module.exports = configurationsCreate
